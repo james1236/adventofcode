@@ -1,0 +1,50 @@
+<script>
+
+//validation:
+//	6 digits
+//	from 387638 to 919123
+//	at least 1 pair of adjacent digits
+//	digits increase or stay the same from left to right
+
+//find total possible passwords
+
+var total = 0;
+for (passIn = 387638; passIn < 919123; passIn++) {
+	if (checkPass(passIn)) {
+		total++;
+	}
+}
+print(total);
+
+function checkPass(pass) {
+	if (pass.toString().length != 6) {
+		return false;
+	}
+	//if (!(pass > 387638 && pass < 919123)) { //no need for range check
+	//	return false;
+	//}
+	
+	adjacentFail = true;
+	prevDigit = pass.toString()[0];
+	for (index = 1; index < pass.toString().length; index++) {
+		if (pass.toString()[index] == prevDigit) {
+			adjacentFail = false;
+		}
+		if (!(parseInt(pass.toString()[index]) >= parseInt(prevDigit))) {
+			return false;
+		}
+		prevDigit = pass.toString()[index];
+	}
+	
+	if (adjacentFail) {
+		return false;
+	}
+	
+	return true;
+}
+
+function print(text) {
+	document.write(text + "<br>");
+}
+
+</script>
