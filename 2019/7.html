@@ -1,0 +1,216 @@
+<script>
+
+var program = [3,8,1001,8,10,8,105,1,0,0,21,38,63,88,97,118,199,280,361,442,99999,3,9,1002,9,3,9,101,2,9,9,1002,9,4,9,4,9,99,3,9,101,3,9,9,102,5,9,9,101,3,9,9,1002,9,3,9,101,3,9,9,4,9,99,3,9,1002,9,2,9,1001,9,3,9,102,3,9,9,101,2,9,9,1002,9,4,9,4,9,99,3,9,102,2,9,9,4,9,99,3,9,102,4,9,9,101,5,9,9,102,2,9,9,101,5,9,9,4,9,99,3,9,1002,9,2,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,99,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,1001,9,1,9,4,9,99,3,9,1002,9,2,9,4,9,3,9,1002,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,1001,9,1,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,4,9,99,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,1002,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,1,9,9,4,9,99,3,9,101,1,9,9,4,9,3,9,101,1,9,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,2,9,4,9,99];
+
+print(bruteSignal());
+print("Max thrust signal ^");
+
+function bruteSignal() {
+	var maxThrustSignal;
+
+	//Using RNG to attempt all reorderings of the sequence 0,1,2,3,4 - ***simple but not very methodic, efficient or 'good'***
+	for (attempt = 0; attempt < 10000; attempt++) {
+		var phaseSequence = [-1,-1,-1,-1,-1];
+		for (digit = 0; digit < 5; digit++) {
+			while (true) {
+				place = randInt(5);
+				if (phaseSequence[place] == -1) {
+					phaseSequence[place] = digit;
+					break;
+				}
+			}
+		}
+		
+		//Attempt to compute with sequence
+		var lastOut = 0;
+		for (amp = 0; amp < 5; amp++) {
+			lastOut = compute(program,[phaseSequence[amp],lastOut])[0];
+		}
+		
+		//Check if new max thrust has been achieved
+		if (maxThrustSignal == undefined || lastOut > maxThrustSignal) {
+			maxThrustSignal = lastOut;
+		}
+	}
+	
+	return maxThrustSignal;
+}
+
+function compute(memIn,inputs=[]) {
+	var mem = JSON.parse(JSON.stringify(memIn)); //JSON parsing used to avoid referencing original through `mem`
+	var outputs = [];
+	
+	prg: for (ip = 0; ip < mem.length; ip+=0) { //ip = instruction pointer
+		
+		var opcode;
+		var paramModes;
+		
+		if (mem[ip].toString().length < 3) {
+			opcode = mem[ip];
+			paramModes = "";
+		} else {
+			//Parameter/Immediate modes specified
+			opcode = parseInt(mem[ip].toString().slice(-2));
+			paramModes = mem[ip].toString().slice(0, -2); 
+		}
+		
+		switch (opcode) {
+			case 1: //Add
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; //immediate mode
+				} else {
+					input1 = mem[mem[ip+1]]; //position mode
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				mem[mem[ip+3]] = input1 + input2;
+				ip+=4;
+				break;
+				
+			case 2: //Multiply
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; 
+				} else {
+					input1 = mem[mem[ip+1]];
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				mem[mem[ip+3]] = input1 * input2;
+				ip+=4;
+				break;		
+				
+			case 3: //Input
+				if (inputs.length) {
+					mem[mem[ip+1]] = inputs.shift(); //Supplies first input from given array
+				} else {
+					mem[mem[ip+1]] = userInput(); //No pre-defined inputs avaliable, request one from user
+				}
+				ip+=2;
+				break;
+				
+			case 4: //Output
+				print(mem[mem[ip+1]]);
+				outputs.push(mem[mem[ip+1]]);
+				ip+=2;
+				break;
+				
+			case 5: //Jump if true (non-zero) 
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; 
+				} else {
+					input1 = mem[mem[ip+1]];
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				if (input1 != 0) {
+					ip = input2; //**jump does not increase ip**
+				} else {
+					ip+=3;
+				}
+				break;
+				
+			case 6: //Jump if false (zero)
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; 
+				} else {
+					input1 = mem[mem[ip+1]];
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				if (input1 == 0) {
+					ip = input2;
+				} else {
+					ip+=3;
+				}
+				break;
+				
+			case 7: //Less than (1 < 2)
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; 
+				} else {
+					input1 = mem[mem[ip+1]];
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				if (input1 < input2) {
+					mem[mem[ip+3]] = 1;
+				} else {
+					mem[mem[ip+3]] = 0;
+				}
+				ip+=4;
+				break;
+				
+			case 8: //Equals
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; 
+				} else {
+					input1 = mem[mem[ip+1]];
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				if (input1 == input2) {
+					mem[mem[ip+3]] = 1;
+				} else {
+					mem[mem[ip+3]] = 0;
+				}
+				ip+=4;
+				break;
+				
+			case 99: //Exit
+				print("Exit");
+				ip+=1;
+				break prg;
+				
+			default: //Other
+				print("Invalid Operation");
+				ip+=1;
+				break prg;
+		}
+	}
+	
+	return outputs;
+}
+
+function print(text) {
+	document.write(text + "<br>");
+}
+
+function userInput(msg="Intcode input: ") {
+	return parseInt(prompt(msg));
+}
+
+function randInt(max) {
+	return Math.floor((Math.random() * 10) % max);
+}
+
+</script>
