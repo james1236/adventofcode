@@ -5,22 +5,32 @@ var program = [3,8,1001,8,10,8,105,1,0,0,21,38,63,88,97,118,199,280,361,442,9999
 print(bruteSignal());
 print("Max thrust signal ^");
 
+function generatePermutations(remainingDigits) { //Deterministically & recursively generates all possible permutations of an input sequence
+	if (remainingDigits.length == 1) {
+		return [[remainingDigits[0]]];
+	} else {
+		var permutations = [];
+		for (var digitIndex = 0; digitIndex < remainingDigits.length; digitIndex++) {
+			var digit = remainingDigits[digitIndex];
+			
+			var tempRemainingDigits = JSON.parse(JSON.stringify(remainingDigits));
+			tempRemainingDigits.splice(digitIndex, 1);
+			
+			var subPermutations = generatePermutations(tempRemainingDigits);
+			for (var permutation of subPermutations) {
+				permutation.unshift(digit);
+				permutations.push(permutation);
+			}
+		}
+		return permutations;
+	}
+}
+
 function bruteSignal() {
 	var maxThrustSignal;
 
-	//Using RNG to attempt all reorderings of the sequence 0,1,2,3,4 - ***simple but not very methodic, efficient or 'good'***
-	for (attempt = 0; attempt < 10000; attempt++) {
-		var phaseSequence = [-1,-1,-1,-1,-1];
-		for (digit = 0; digit < 5; digit++) {
-			while (true) {
-				place = randInt(5);
-				if (phaseSequence[place] == -1) {
-					phaseSequence[place] = digit;
-					break;
-				}
-			}
-		}
-		
+	//Attempt all possible phase sequences
+	for (var phaseSequence of generatePermutations([0,1,2,3,4])) {
 		//Attempt to compute with sequence
 		var lastOut = 0;
 		for (amp = 0; amp < 5; amp++) {
@@ -207,10 +217,6 @@ function print(text) {
 
 function userInput(msg="Intcode input: ") {
 	return parseInt(prompt(msg));
-}
-
-function randInt(max) {
-	return Math.floor((Math.random() * 10) % max);
 }
 
 </script>
