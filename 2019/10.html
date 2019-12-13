@@ -1,0 +1,131 @@
+<script>
+
+var input = ["##.###.#.......#.#....#....#..........#.",
+			 "....#..#..#.....#.##.............#......",
+			 "...#.#..###..#..#.....#........#......#.",
+			 "#......#.....#.##.#.##.##...#...#......#",
+			 ".............#....#.....#.#......#.#....",
+			 "..##.....#..#..#.#.#....##.......#.....#",
+			 ".#........#...#...#.#.....#.....#.#..#.#",
+			 "...#...........#....#..#.#..#...##.#.#..",
+			 "#.##.#.#...#..#...........#..........#..",
+			 "........#.#..#..##.#.##......##.........",
+			 "................#.##.#....##.......#....",
+			 "#............#.........###...#...#.....#",
+			 "#....#..#....##.#....#...#.....#......#.",
+			 ".........#...#.#....#.#.....#...#...#...",
+			 ".............###.....#.#...##...........",
+			 "...#...#.......#....#.#...#....#...#....",
+			 ".....#..#...#.#.........##....#...#.....",
+			 "....##.........#......#...#...#....#..#.",
+			 "#...#..#..#.#...##.#..#.............#.##",
+			 ".....#...##..#....#.#.##..##.....#....#.",
+			 "..#....#..#........#.#.......#.##..###..",
+			 "...#....#..#.#.#........##..#..#..##....",
+			 ".......#.##.....#.#.....#...#...........",
+			 "........#.......#.#...........#..###..##",
+			 "...#.....#..#.#.......##.###.###...#....",
+			 "...............#..#....#.#....#....#.#..",
+			 "#......#...#.....#.#........##.##.#.....",
+			 "###.......#............#....#..#.#......",
+			 "..###.#.#....##..#.......#.............#",
+			 "##.#.#...#.#..........##.#..#...##......",
+			 "..#......#..........#.#..#....##........",
+			 "......##.##.#....#....#..........#...#..",
+			 "#.#..#..#.#...........#..#.......#..#.#.",
+			 "#.....#.#.........#............#.#..##.#",
+			 ".....##....#.##....#.....#..##....#..#..",
+			 ".#.......#......#.......#....#....#..#..",
+			 "...#........#.#.##..#.#..#..#........#..",
+			 "#........#.#......#..###....##..#......#",
+			 "...#....#...#.....#.....#.##.#..#...#...",
+			 "#.#.....##....#...........#.....#...#..."];
+
+			 
+var asteroids = decodeMap(input);
+print(mostAsteroidsVisible(asteroids));
+			 
+function decodeMap(map) {
+	var asteroids = [];
+	for (y = 0; y < map.length; y++) {
+		for (x = 0; x < map[y].length; x++) {
+			if (map[y][x] == "#") {
+				asteroids.push([x,y]);
+			}
+		}
+	}
+	return asteroids;
+}
+
+function mostAsteroidsVisible(asteroids) {
+	var maxCount = 0;
+	for (perspective of asteroids) { //run asteroidsVisible() for all asteroids and return max
+		count = asteroidsVisible(perspective, asteroids);
+		if (count > maxCount) {
+			maxCount = count;
+		}
+	}
+	return maxCount;
+}
+
+function asteroidsVisible(perspective,asteroids) {
+	var count = 0;
+	for (var asteroid of asteroids) {
+		//Don't check self
+		if (asteroid[0] == perspective[0] && asteroid[1] == perspective[1]) {
+			continue;
+		}
+		
+		//Calculate gradient to get from perspective to asteroid
+		var gradient = [0,0];
+		gradient[0] = asteroid[0]-perspective[0];
+		gradient[1] = asteroid[1]-perspective[1];
+		
+		//Simplify gradient to avoid skipping over asteroids
+		do {
+			var factorFound = false;
+			max = (Math.abs(gradient[0]) > Math.abs(gradient[1])) ? Math.abs(gradient[0]) : Math.abs(gradient[1]);
+			for (factor = max; factor > 1; factor--) { //Keep diving gradient by common factors starting with max number
+				if (Number.isInteger(gradient[0]/factor) && Number.isInteger(gradient[1]/factor)) {
+					factorFound = true;
+					gradient[0] = gradient[0]/factor;
+					gradient[1] = gradient[1]/factor;
+					break;
+				}
+			}
+		} while (factorFound);
+		
+		//Test line of sight, stop on first asteroid
+		losX = perspective[0];
+		losY = perspective[1];
+		losTest: while (true) {
+			//Move test position
+			losX+=gradient[0];
+			losY+=gradient[1];
+			
+			//Check if out of bounds
+			if (losX >= input[0].length || losY >= input.length || 0 > losX || 0 > losY) {
+				break losTest;
+			}
+			
+			//Check if on asteroid
+			onAsteroid = false;
+			if (input[losY][losX] == "#") {
+				onAsteroid = true;
+				break losTest;
+			}
+		}
+		
+		//Check if the asteroid stopped on is the target asteroid
+		if (losX == asteroid[0] && losY == asteroid[1]) {
+			count++;
+		}
+	}
+	return count;
+}
+
+function print(text) {
+	document.write(text + "<br>");
+}
+
+</script>
