@@ -10,10 +10,7 @@ var layerArea = width * height;
 var layers = splitToLayers(pixels,layerArea); 
 
 print(imageParity(layers));
-
-function print(text) {
-	document.write(text + "<br>");
-}
+printImage(mergeLayers(layers),width);
 
 function splitToLayers(pixels,layerArea) {
 	var layers = [];
@@ -47,7 +44,39 @@ function digitFrequencyInLayer(layer, digit) {
 			digitTotal++;
 		}
 	}
-	return digitTotal
+	return digitTotal;
+}
+
+function mergeLayers(layers) {
+	var image = [];
+	for (layerIndex = 0; layerIndex < layers.length; layerIndex++) {
+		for (pixelIndex = 0; pixelIndex < layers[layerIndex].length; pixelIndex++) {
+			if (layerIndex == 0) {
+				image.push(layers[layerIndex][pixelIndex]);
+			} else {
+				if (layers[layerIndex][pixelIndex] != 2) { //Transparent in writing layer has no effect
+					if (image[pixelIndex] == 2) { //Image transparent: able to be overwritten
+						image[pixelIndex] = layers[layerIndex][pixelIndex]; //Transparent of final image overriden
+					}
+				}
+			}
+		}
+	}
+	return image;
+}
+
+function printImage(pixels,width) {
+	lines = [];
+	for (startPixel = 0; startPixel < pixels.length; startPixel+=width) {
+		lines.push(pixels.slice(startPixel,startPixel+width));
+	}
+	for (line of lines) {
+		print(line.join().split("1").join("#").split("0").join("_")); //replaceAll to make it look nice
+	}
+}
+
+function print(text) {
+	document.write(text + "<br>");
 }
 
 </script>
