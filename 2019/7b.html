@@ -1,0 +1,256 @@
+<script>
+
+var program = [3,8,1001,8,10,8,105,1,0,0,21,38,63,88,97,118,199,280,361,442,99999,3,9,1002,9,3,9,101,2,9,9,1002,9,4,9,4,9,99,3,9,101,3,9,9,102,5,9,9,101,3,9,9,1002,9,3,9,101,3,9,9,4,9,99,3,9,1002,9,2,9,1001,9,3,9,102,3,9,9,101,2,9,9,1002,9,4,9,4,9,99,3,9,102,2,9,9,4,9,99,3,9,102,4,9,9,101,5,9,9,102,2,9,9,101,5,9,9,4,9,99,3,9,1002,9,2,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,99,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,1001,9,1,9,4,9,99,3,9,1002,9,2,9,4,9,3,9,1002,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,1001,9,1,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,102,2,9,9,4,9,99,3,9,102,2,9,9,4,9,3,9,101,1,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,1002,9,2,9,4,9,3,9,102,2,9,9,4,9,3,9,1002,9,2,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,1,9,9,4,9,99,3,9,101,1,9,9,4,9,3,9,101,1,9,9,4,9,3,9,101,1,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,2,9,4,9,3,9,101,2,9,9,4,9,3,9,102,2,9,9,4,9,3,9,1001,9,1,9,4,9,3,9,1001,9,2,9,4,9,99];
+
+
+print(bruteFeedbackSignal());
+print("Max feedback thrust signal ^");
+
+
+function generatePermutations(remainingDigits) { //Deterministically & recursively generates all possible permutations of an input sequence
+	if (remainingDigits.length == 1) {
+		return [[remainingDigits[0]]];
+	} else {
+		var permutations = [];
+		for (var digitIndex = 0; digitIndex < remainingDigits.length; digitIndex++) {
+			var digit = remainingDigits[digitIndex];
+			
+			var tempRemainingDigits = JSON.parse(JSON.stringify(remainingDigits));
+			tempRemainingDigits.splice(digitIndex, 1);
+			
+			var subPermutations = generatePermutations(tempRemainingDigits);
+			for (var permutation of subPermutations) {
+				permutation.unshift(digit);
+				permutations.push(permutation);
+			}
+		}
+		return permutations;
+	}
+}
+
+
+function bruteFeedbackSignal() {
+	var maxThrustSignal;
+	var amps;
+
+	//Attempt all possible phase sequences
+	for (var phaseSequence of generatePermutations([5,6,7,8,9])) {
+		amps = [];
+		
+		//Starting each amplifier program and saving their states (mem, ip & output)
+		for (var ampIndex = 0; ampIndex < phaseSequence.length; ampIndex++) {
+			amps[ampIndex] = compute(program, 0, [phaseSequence[ampIndex]]);
+		}
+		
+		amps[0] = compute(amps[0].mem, amps[0].ip, [0]); //Catalyst input
+		
+		//Load each program, passing the previous amp's input as output and loop until one halts
+		ampIndex = 1;
+		lastAmpIndex = 0;
+		if (amps[0].output != null) {
+			while (true) {
+				//Setting input to last amp output
+				amps[ampIndex] = compute(amps[ampIndex].mem, amps[ampIndex].ip, [amps[lastAmpIndex].output]);
+				
+				//Exiting if no output found (feedback ended)
+				if (amps[ampIndex].output == null) {
+					//Updating max
+					if (maxThrustSignal == undefined || amps[lastAmpIndex].output > maxThrustSignal) {
+						maxThrustSignal = amps[lastAmpIndex].output;
+					}
+					break;
+				}
+				
+				//Chaining amps correctly
+				lastAmpIndex = ampIndex;
+				ampIndex++;
+				if (ampIndex >= phaseSequence.length) {
+					ampIndex = 0;
+				}
+			}
+		}
+	}
+	
+	return maxThrustSignal;
+}
+
+function compute(memIn,ip=0,inputs=[]) {
+	var mem = JSON.parse(JSON.stringify(memIn)); //JSON parsing used to avoid referencing original through `mem`
+	var output = null;
+	var state = null;
+	var ip;
+	
+	prg: while(ip < mem.length) { //ip = instruction pointer
+		
+		var opcode;
+		var paramModes;
+		
+		if (mem[ip].toString().length < 3) {
+			opcode = mem[ip];
+			paramModes = "";
+		} else {
+			//Parameter/Immediate modes specified
+			opcode = parseInt(mem[ip].toString().slice(-2));
+			paramModes = mem[ip].toString().slice(0, -2); 
+		}
+		
+		switch (opcode) {
+			case 1: //Add
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; //immediate mode
+				} else {
+					input1 = mem[mem[ip+1]]; //position mode
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				mem[mem[ip+3]] = input1 + input2;
+				ip+=4;
+				break;
+				
+			case 2: //Multiply
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; 
+				} else {
+					input1 = mem[mem[ip+1]];
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				mem[mem[ip+3]] = input1 * input2;
+				ip+=4;
+				break;		
+				
+			case 3: //Input
+				if (inputs.length) {
+					mem[mem[ip+1]] = inputs.shift(); //Supplies first input from given array
+				} else {
+					state = "input"; //No pre-defined inputs avaliable, halt and get one
+					break prg;
+				}
+				ip+=2;
+				break;
+				
+			case 4: //Output
+				print(mem[mem[ip+1]]);
+				output = mem[mem[ip+1]];
+				ip+=2;
+				state = "output";
+				break prg;
+				
+			case 5: //Jump if true (non-zero) 
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; 
+				} else {
+					input1 = mem[mem[ip+1]];
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				if (input1 != 0) {
+					ip = input2; //**jump does not increase ip**
+				} else {
+					ip+=3;
+				}
+				break;
+				
+			case 6: //Jump if false (zero)
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; 
+				} else {
+					input1 = mem[mem[ip+1]];
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				if (input1 == 0) {
+					ip = input2;
+				} else {
+					ip+=3;
+				}
+				break;
+				
+			case 7: //Less than (1 < 2)
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; 
+				} else {
+					input1 = mem[mem[ip+1]];
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				if (input1 < input2) {
+					mem[mem[ip+3]] = 1;
+				} else {
+					mem[mem[ip+3]] = 0;
+				}
+				ip+=4;
+				break;
+				
+			case 8: //Equals
+				if (paramModes.length > 0 && paramModes[paramModes.length-1] == 1) {
+					input1 = mem[ip+1]; 
+				} else {
+					input1 = mem[mem[ip+1]];
+				}
+				
+				if (paramModes.length > 1 && paramModes[paramModes.length-2] == 1) {
+					input2 = mem[ip+2]; 
+				} else {
+					input2 = mem[mem[ip+2]];
+				}
+				
+				if (input1 == input2) {
+					mem[mem[ip+3]] = 1;
+				} else {
+					mem[mem[ip+3]] = 0;
+				}
+				ip+=4;
+				break;
+				
+			case 99: //Exit
+				print("Exit");
+				ip+=1;
+				state = "halt";
+				break prg;
+				
+			default: //Other
+				print("Invalid Operation");
+				ip+=1;
+				state = "halt";
+				break prg;
+		}
+	}
+	
+	return {state:state, mem:mem, ip:ip, output:output};
+}
+
+function print(text) {
+	document.write(text + "<br>");
+}
+
+function userInput(msg="Intcode input: ") {
+	return parseInt(prompt(msg));
+}
+
+</script>
