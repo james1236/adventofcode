@@ -1,0 +1,73 @@
+<script>
+
+var input = ["<x=5, y=4, z=4>",
+			 "<x=-11, y=-11, z=-3>",
+			 "<x=0, y=7, z=0>",
+			 "<x=-13, y=2, z=10>"];
+
+
+var moons = [];
+
+decodeInput();
+simulateSteps(1000);
+console.log(moons);
+print(calculateTotalEnergy());
+
+
+function decodeInput() {
+	for (line of input) {
+		var positions = line.split("<").join("").split(">").join("").split("=").join("").split("x").join("").split("y").join("").split("z").join("").split(" ").join("").split(",");
+	
+		moons.push([
+			[0,0,0],
+			[parseInt(positions[0]),parseInt(positions[1]),parseInt(positions[2])],
+		]);
+	}
+}
+
+function applyGravity() {
+	for (sourceIndex = 0; sourceIndex < moons.length; sourceIndex++) {
+		for (targetIndex = sourceIndex; targetIndex < moons.length; targetIndex++) {
+			for (axis = 0; axis < 3; axis++) {
+				if (moons[sourceIndex][1][axis] > moons[targetIndex][1][axis]) {
+					moons[sourceIndex][0][axis]-=1;
+					moons[targetIndex][0][axis]+=1;
+				} else if (moons[sourceIndex][1][axis] < moons[targetIndex][1][axis]) {
+					moons[sourceIndex][0][axis]+=1;
+					moons[targetIndex][0][axis]-=1;
+				}
+			}
+		}
+	}
+}
+
+function applyVelocity() {
+	for (moon of moons) {
+		for (axis = 0; axis < 3; axis++) {
+			moon[1][axis] += moon[0][axis];
+		}
+	}
+}
+
+function simulateSteps(steps) {
+	for (step = 0; step < steps; step++) {
+		applyGravity();
+		applyVelocity();
+	}
+}
+
+function calculateTotalEnergy() {
+	var totalEnergy = 0;
+	for (moon of moons) {
+		kinetic = Math.abs(moon[0][0]) + Math.abs(moon[0][1]) + Math.abs(moon[0][2]);
+		potential = Math.abs(moon[1][0]) + Math.abs(moon[1][1]) + Math.abs(moon[1][2]);
+		totalEnergy += (potential * kinetic);
+	}
+	return totalEnergy;
+}
+
+function print(text) {
+	document.write(text + "<br>");
+}
+
+</script>
