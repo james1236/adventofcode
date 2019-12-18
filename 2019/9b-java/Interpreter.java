@@ -85,6 +85,24 @@ public class Interpreter
         }
     }
     
+    public long awaitOutput(long input) {
+        while (true) {
+            long out = step(input);
+            if (out != Long.MAX_VALUE) {
+                return out;
+            }
+        }
+    }
+    
+    public long awaitOutput() {
+        while (true) {
+            long out = step();
+            if (out != Long.MAX_VALUE) {
+                return out;
+            }
+        }
+    }
+    
     //Overloading for optional input
     
     public long step() {
@@ -109,15 +127,18 @@ public class Interpreter
                 parameters = 1;
                 if (input == Long.MAX_VALUE) {
                     System.out.println("Error: Unsupplied Input");
+                    return Long.MIN_VALUE;
                 }
                 setModeData(0, input);
+                input = Long.MAX_VALUE;
                 break;
             case 4:
                 //Output
                 parameters = 1;
-                System.out.println(getModeData(0));
+                long out = getModeData(0);
+                System.out.println(out);
                 memory.incrementInstructionPointer(parameters+1);
-                return getModeData(0);
+                return out;
             case 5:
                 //Jump if true (non-zero) return for non-increment case, break for increment case
                 parameters = 2;

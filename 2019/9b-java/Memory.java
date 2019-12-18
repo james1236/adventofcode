@@ -47,7 +47,7 @@ public class Memory
         return memory.get(address);
     }
     
-    //Get Modes *CONFIRMED*
+    //Get Modes
     
     public long getPositionData(int offset) {
         //Get the data from the address stored at ip + offset
