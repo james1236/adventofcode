@@ -1,48 +1,39 @@
-import java.util.ArrayList;
-import java.util.Arrays;
+package com.company;
 
-public class Interpreter
-{
+public class Interpreter {
     private Memory memory;
-    
-    public Interpreter(long[] program)
-    {
+
+    public Interpreter(String program) {
         setProgram(program);
     }
-    
-    public Interpreter(String program)
-    {
-        setProgram(program);
-    }
-    
+
     public void setProgram(long[] program) {
         memory = new Memory(program);
     }
-    
+
     public void setProgram(String programString) {
         String[] programSplit = programString.split("\\s*,\\s*");
         long[] program = new long[programSplit.length];
-        
+
         for (int i = 0; i < programSplit.length; i++) {
             program[i] = Long.parseLong(programSplit[i]);
         }
-        
+
         setProgram(program);
     }
 
-    private int getOpcode()
-    {
+    private int getOpcode() {
         String dataString = Long.toString(memory.getPointerData()); //Get combined opcode & parameter modes string
         //If no param modes are given, return opcode alone;
         if (dataString.length() < 3) {
             return Integer.parseInt(dataString);
         }
-        
+
         //Return last two characters of the stringified data at
         //the instruction pointer as an integer
         return Integer.parseInt(dataString.substring(dataString.length()-2));
     }
-    
+
     private int getParameterMode(int parameterIndex) {
         //Returns the parameter mode for the supplied parameter's index
         String dataString = Long.toString(memory.getPointerData()); //Get combined opcode & parameter modes string
@@ -53,7 +44,7 @@ public class Interpreter
         //Return the correct parameter mode index
         return Integer.parseInt(Character.toString(dataString.charAt(dataString.length()-3-parameterIndex)));
     }
-    
+
     private long getModeData(int parameterIndex) {
         switch (getParameterMode(parameterIndex)) {
             case 1:
@@ -67,7 +58,7 @@ public class Interpreter
                 return memory.getPositionData(parameterIndex+1);
         }
     }
-    
+
     private void setModeData(int parameterIndex, long data) {
         switch (getParameterMode(parameterIndex)) {
             case 1:
@@ -84,7 +75,7 @@ public class Interpreter
                 break;
         }
     }
-    
+
     public long awaitOutput(long input) {
         while (true) {
             long out = step(input);
@@ -93,7 +84,7 @@ public class Interpreter
             }
         }
     }
-    
+
     public long awaitOutput() {
         while (true) {
             long out = step();
@@ -102,13 +93,13 @@ public class Interpreter
             }
         }
     }
-    
+
     //Overloading for optional input
-    
+
     public long step() {
         return step(Long.MAX_VALUE);
     }
-    
+
     public long step(long input) {
         int parameters;
         switch (getOpcode()) {
@@ -130,7 +121,6 @@ public class Interpreter
                     return Long.MIN_VALUE;
                 }
                 setModeData(0, input);
-                input = Long.MAX_VALUE;
                 break;
             case 4:
                 //Output
@@ -142,7 +132,7 @@ public class Interpreter
             case 5:
                 //Jump if true (non-zero) return for non-increment case, break for increment case
                 parameters = 2;
-                if (getModeData(0) != 0l) {
+                if (getModeData(0) != 0L) {
                     memory.setInstructionPointer((int)getModeData(1));
                     return Long.MAX_VALUE;
                 }
@@ -150,7 +140,7 @@ public class Interpreter
             case 6:
                 //Jump if false (zero)
                 parameters = 2;
-                if (getModeData(0) == 0l) {
+                if (getModeData(0) == 0L) {
                     memory.setInstructionPointer((int)getModeData(1));
                     return Long.MAX_VALUE;
                 }
@@ -159,18 +149,18 @@ public class Interpreter
                 //Less than (1 < 2)
                 parameters = 3;
                 if (getModeData(0) < getModeData(1)) {
-                    setModeData(2, 1l);
+                    setModeData(2, 1L);
                 } else {
-                    setModeData(2, 0l);
+                    setModeData(2, 0L);
                 }
                 break;
             case 8:
                 //Equals
                 parameters = 3;
                 if (getModeData(0) == getModeData(1)) {
-                    setModeData(2, 1l);
+                    setModeData(2, 1L);
                 } else {
-                    setModeData(2, 0l);
+                    setModeData(2, 0L);
                 }
                 break;
             case 9:
@@ -180,11 +170,9 @@ public class Interpreter
                 break;
             case 99:
                 //Exit
-                parameters = 0;
                 System.out.println("Exit");
                 return Long.MIN_VALUE; //MIN_VALUE represents halt action
             default:
-                parameters = 0;
                 System.out.println("Error: Invalid operation");
                 return Long.MIN_VALUE; //MIN_VALUE represents halt action
         }
