@@ -1,0 +1,964 @@
+<script>
+
+var input = [3,1033,1008,1033,1,1032,1005,1032,31,1008,1033,2,1032,1005,1032,58,1008,1033,3,1032,1005,1032,81,1008,1033,4,1032,1005,1032,104,99,101,0,1034,1039,1001,1036,0,1041,1001,1035,-1,1040,1008,1038,0,1043,102,-1,1043,1032,1,1037,1032,1042,1105,1,124,102,1,1034,1039,1002,1036,1,1041,1001,1035,1,1040,1008,1038,0,1043,1,1037,1038,1042,1106,0,124,1001,1034,-1,1039,1008,1036,0,1041,1002,1035,1,1040,102,1,1038,1043,102,1,1037,1042,1106,0,124,1001,1034,1,1039,1008,1036,0,1041,1001,1035,0,1040,1002,1038,1,1043,101,0,1037,1042,1006,1039,217,1006,1040,217,1008,1039,40,1032,1005,1032,217,1008,1040,40,1032,1005,1032,217,1008,1039,37,1032,1006,1032,165,1008,1040,33,1032,1006,1032,165,1101,0,2,1044,1106,0,224,2,1041,1043,1032,1006,1032,179,1101,0,1,1044,1105,1,224,1,1041,1043,1032,1006,1032,217,1,1042,1043,1032,1001,1032,-1,1032,1002,1032,39,1032,1,1032,1039,1032,101,-1,1032,1032,101,252,1032,211,1007,0,62,1044,1106,0,224,1101,0,0,1044,1106,0,224,1006,1044,247,101,0,1039,1034,1002,1040,1,1035,102,1,1041,1036,101,0,1043,1038,1001,1042,0,1037,4,1044,1106,0,0,60,10,88,42,71,78,10,10,70,23,65,29,47,58,86,53,77,61,77,63,18,9,20,68,45,15,67,3,95,10,14,30,81,53,3,83,46,31,95,43,94,40,21,54,93,91,35,80,9,17,81,94,59,83,49,96,61,63,24,85,69,82,45,71,48,39,32,69,93,11,90,19,78,54,79,66,6,13,76,2,67,69,10,9,66,43,73,2,92,39,12,99,33,89,18,9,78,11,96,23,55,96,49,12,85,93,49,22,70,93,59,76,68,55,66,54,32,34,36,53,64,84,87,61,43,79,7,9,66,40,69,9,76,92,18,78,49,39,80,32,70,52,74,37,86,11,77,51,15,28,84,19,13,75,28,86,3,82,93,15,79,61,93,93,31,87,43,67,44,83,78,43,46,46,12,89,19,85,44,95,65,24,70,93,50,98,72,66,80,23,87,19,97,40,25,9,49,6,81,35,9,52,71,27,63,3,96,94,21,24,48,79,67,72,72,15,85,93,22,95,34,3,63,21,79,9,51,92,45,87,25,41,80,13,88,68,66,18,85,75,39,80,17,54,93,89,65,21,91,73,53,60,69,29,82,99,5,22,65,9,69,61,80,63,38,71,61,61,11,68,30,74,11,26,53,59,97,2,12,74,79,44,73,72,27,17,34,92,26,27,88,66,5,97,34,81,86,30,35,6,64,36,34,65,80,12,90,65,95,21,90,55,43,71,89,56,97,91,27,27,73,80,34,22,48,89,84,35,88,90,47,4,32,77,31,2,82,66,76,43,74,68,56,78,36,59,66,58,75,89,96,51,51,97,34,49,86,70,26,46,89,43,99,97,66,32,51,32,77,33,86,92,56,68,64,39,83,55,25,98,24,56,73,21,98,39,24,67,21,4,76,10,32,91,53,82,37,59,72,63,78,43,67,2,72,69,50,71,19,72,92,51,12,93,61,88,24,84,35,93,30,63,70,7,78,83,42,63,6,25,24,73,76,22,99,68,14,85,14,75,32,88,42,47,97,2,91,97,51,79,12,71,91,7,1,87,82,21,98,63,37,19,85,1,48,77,54,76,12,92,28,91,25,85,88,8,92,32,67,18,56,51,67,58,80,59,77,76,25,7,73,58,72,96,75,15,27,37,23,83,58,68,83,50,67,41,39,89,24,1,83,63,8,64,54,76,50,3,89,97,74,48,15,91,22,37,71,77,9,1,85,38,23,58,10,75,86,72,80,59,24,64,7,63,85,53,61,89,68,7,80,4,68,56,39,66,31,69,6,7,76,88,17,89,42,64,56,11,97,65,64,71,88,61,31,32,53,88,99,55,73,20,90,10,86,32,50,89,53,83,42,80,28,63,98,38,85,72,57,88,23,52,96,77,39,65,88,40,26,91,56,1,94,51,94,24,20,81,74,23,45,72,56,22,84,70,44,50,68,32,98,51,75,3,61,75,59,3,7,98,76,45,78,47,74,60,69,78,54,67,29,63,47,79,72,57,73,44,63,98,6,93,36,20,27,90,77,39,44,64,68,47,48,69,78,29,76,48,1,81,10,67,32,72,47,89,83,18,39,85,65,97,15,59,13,74,29,84,50,80,94,8,27,83,67,43,75,52,96,17,82,29,83,45,85,82,71,76,44,30,10,91,16,7,31,63,2,68,75,46,70,28,93,91,17,13,81,57,93,32,27,65,61,93,11,84,10,66,14,83,14,77,26,77,13,86,21,84,87,87,34,99,69,88,1,74,61,72,54,93,16,76,54,86,63,94,13,79,24,97,0,0,21,21,1,10,1,0,0,0,0,0,0];
+
+//Increase memory size to avoid out of bounds errors
+input = expandMemory(input, 150000);
+
+var mem; //Working memory
+
+var defaultState = {
+	mem: JSON.parse(JSON.stringify(input)), //JSON parsing used to avoid referencing `input` through `mem`
+	ip: 0,
+	relativeBase: 0,
+};
+
+var currentState = JSON.parse(JSON.stringify(defaultState));
+var running = true;
+
+var robotDefault = {
+	x: 0,
+	y: 0,
+	facing: 0,
+	lastWallX:null,
+	lastWallX:null,
+	stepsSinceNewWall:0,
+}
+
+var targetX;
+var targetY;
+var targetFound = false;
+
+var robot = JSON.parse(JSON.stringify(robotDefault));
+
+var facing = ["up","right","down","left"];
+
+var terrain = [];
+var mappingAI = false;
+var mappingAIInterval;
+var screenDrawInterval;
+
+var crawlers = [];
+
+//Moves the robot around the ship while keeping the wall on one side (to cover entire area)
+function move() {
+	if (robot.stepsSinceNewWall > 300) { //Terminate mapping if no new tiles have been discovered for 300 moves
+		document.getElementById("mappingAI").checked = false;
+		document.getElementById("mappingAI").disabled = true;
+		mappingAICheck();
+		
+		document.getElementById("pathingAI").disabled = false;
+		document.getElementById("pathingAI").id = "pathingAIEnabled";
+		
+		return;
+	}
+	
+	robot.stepsSinceNewWall++;
+
+	/*
+		XX = player
+	
+		2A  3A  1A 
+		
+		2C  XX  1C
+		
+		2B  3B  1B
+	*/
+
+	//Wall found
+	if (robot.lastWallX != null) {
+		//Always keep the wall on one side (values found visually through map)
+		if (robot.lastWallX >  robot.x) { //1
+			if (robot.lastWallY <  robot.y) { //1A
+				//right
+				runBot(3);
+			}
+			if (robot.lastWallY >  robot.y) { //1B
+				//down
+				runBot(2);
+			}
+			if (robot.lastWallY == robot.y) { //1C
+				//down
+				runBot(2);
+			}
+		}
+		if (robot.lastWallX <  robot.x) { //2
+			if (robot.lastWallY <  robot.y) { //2A
+				//up
+				runBot(1);
+			}
+			if (robot.lastWallY >  robot.y) { //2B
+				//left
+				runBot(4);
+			}
+			if (robot.lastWallY == robot.y) { //2C
+				//up
+				runBot(1);
+			}
+		}
+		if (robot.lastWallX == robot.x) { //3
+			if (robot.lastWallY <  robot.y) { //3A
+				//right
+				runBot(3);
+			}
+			if (robot.lastWallY >  robot.y) { //3B
+				//left
+				runBot(4);
+			}
+		}
+	} else {
+		runBot(4);
+	}
+}
+
+function tileAtCoords(x,y) {
+	for (tile of terrain) {
+		if (tile[0] == x && tile[1] == y) {
+			return tile[2];
+		}
+	}
+	alert("oob tile");
+	return -1;
+}
+
+function beginPathFind() {
+	for (tile of terrain) {
+		if (tile[2] == "O") { //Oxygen (end point)
+			targetX = tile[0];
+			targetY = tile[1];
+			break;
+		}
+	}
+	
+	//Set initial facing direction to only empty tile
+	var crawler = {
+		x:0,
+		y:0,
+		facing: null,
+	}
+	crawler = faceClearPath(crawler);
+	
+	findShortestPath(crawler.x,crawler.y,crawler.facing,-1);
+}
+
+//Sum of all the path segments taken by the crawler that found the oxygen
+function pathLength(crawlersList) {
+	var total = 0;
+	var parent = crawlers.length-1;
+	while (parent != -1) {
+		total += crawlers[parent].pathLength;
+		parent = crawlers[parent].parent;
+	}
+	return total;
+}
+
+function findShortestPath(x,y,facing,parent) {
+	//Once target is found, break out of recursion
+	if (targetFound) {
+		return "dead";
+	}
+	
+	//Create pathfinding crawler (custom robot instance)
+	var index = crawlers.length;
+	crawlers.push({
+		x:x,
+		y:y,
+		facing:facing,
+		parent:parent,
+		pathLength: 0,
+	});
+	
+	while (true) {
+		//On crawler initialization facing is already given, don't call faceClearPath();
+		if (crawlers[index].pathLength == 0) {
+			crawlers[index].output = "done";
+		} else {
+			//Every other time, faceClearPath before trying to move
+			crawlers[index] = faceClearPath(crawlers[index]);
+		}
+		
+		if (crawlers[index].output == "done") {
+			switch (crawlers[index].facing) {
+				case 0: //up
+					crawlers[index].y--;
+					break;
+				case 1: //right
+					crawlers[index].x++;
+					break;
+				case 2: //down
+					crawlers[index].y++;
+					break;
+				case 3: //left
+					crawlers[index].x--;
+					break;
+			}
+			
+			addTile(crawlers[index].x,crawlers[index].y,["%","^","(",")","[","]","{","}","-","+"][parseInt((index+"")[(index+"").length -1])]);
+			//alert("#"+crawlers[index].num+" -- x: "+crawlers[index].x+", y: "+crawlers[index].y);
+			crawlers[index].pathLength++;
+		}
+		
+		if (crawlers[index].output == "dead") {
+			return "dead";
+		}
+		
+		if (crawlers[index].output.indexOf("fork") != -1) { //once mapping is complete, start setting tiles by modifying lines directly
+			var faces = JSON.parse(crawlers[index].output.split(" ")[1]);
+			var path1 = findShortestPath(crawlers[index].x,crawlers[index].y,faces[0],index);
+			var path2 = findShortestPath(crawlers[index].x,crawlers[index].y,faces[1],index);
+			
+			return "dead";
+		}
+		
+		//Oxygen found
+		if (crawlers[index].x == targetX && crawlers[index].y == targetY) {
+			drawMap();
+			print("Path Length: "+pathLength(index));
+			return "dead";
+		}
+	}
+}
+
+//Sets to crawler to face the remaining clear path (also handles no path & multiple paths)
+function faceClearPath(crawler) {
+	//180* turn means kill path
+	var tile;
+	var faces = [];
+	crawler.output = null;
+	
+	//Checking if path ahead is free in each direction and adding the free path the faces if true
+	tile = tileAtCoords(crawler.x,crawler.y+1);
+	if (tile != "#" && tile != "$") {
+		//face down
+		if (crawler.facing != 0) {
+			faces.push(2);
+		}
+	}
+	tile = tileAtCoords(crawler.x,crawler.y-1);
+	if (tile != "#" && tile != "$") {
+		//face up
+		if (crawler.facing != 2) {
+			faces.push(0);
+		}
+	}
+	tile = tileAtCoords(crawler.x+1,crawler.y);
+	if (tile != "#" && tile != "$") {
+		//face right
+		if (crawler.facing != 3) {
+			faces.push(1);
+		}
+	}
+	tile = tileAtCoords(crawler.x-1,crawler.y);
+	if (tile != "#" && tile != "$") {
+		//face left
+		if (crawler.facing != 1) {
+			faces.push(3);
+		}
+	}
+	
+	//faces.length = number of valid (non-180) paths found
+	switch (faces.length) {
+		case 0: 
+			crawler.output = "dead";
+			break;
+		case 1:
+			crawler.facing = faces[0];
+			crawler.output = "done";
+			break;
+		case 2:
+			//A fork in path options is there, return both directions
+			crawler.output = "fork "+JSON.stringify(faces);
+			break;
+	}
+	
+	return crawler;
+}
+
+function runBot(direction) {
+	switch (direction) {
+		case 1: //up
+			robot.y -= 1;
+			robot.facing = 0;
+			break;
+		case 2: //down
+			robot.y += 1;
+			robot.facing = 2;
+			break;
+		case 3: //right
+			robot.x += 1;
+			robot.facing = 1;
+			break;
+		case 4: //left
+			robot.x -= 1;
+			robot.facing = 3;
+			break;
+	}
+
+	currentState.output = null;
+	currentState.status = null;
+	currentState = compute(currentState.mem,currentState.ip,currentState.relativeBase,direction);
+
+	//Exit if halt
+	if (currentState.status != "output") {
+		running = false;
+		return;
+	}
+	
+	if (currentState.output == 1) { //Empty
+		addTile(robot.x,robot.y,".");
+	}	
+	if (currentState.output == 0) { //Wall hit
+		wallX = robot.x;
+		wallY = robot.y;
+		switch (direction) { //Undo Robot Movement
+			case 1: //up
+				robot.y += 1;
+				break;
+			case 2: //down
+				robot.y -= 1;
+				break;
+			case 3: //right
+				robot.x -= 1;
+				break;
+			case 4: //left
+				robot.x += 1;
+				break;
+		}
+		addTile(wallX,wallY,"#");
+		robot.lastWallX = wallX;
+		robot.lastWallY = wallY;
+	}
+	if (currentState.output == 2) { //Oxygen
+		addTile(robot.x,robot.y,"O")
+	}
+}
+
+function addTile(x,y,tile) {
+	for (elm of terrain) {
+		if (elm[0] == x && elm[1] == y) {
+			//Replace existing tile in terrain
+			if (elm[2] != "O") {
+				elm[2] = tile;
+			}
+			return;
+		}
+	}
+	
+	//Add new tile in terrain
+	terrain.push([x,y,tile]);
+	if (tile == "#") {
+		robot.stepsSinceNewWall = 0;
+	}
+}
+
+function drawMap() {
+	minX = 0;
+	maxX = 0;
+	minY = 0;
+	maxY = 0;
+	
+	//Set the bounds
+	for (tile of terrain) {
+		if (tile[0] > maxX) {
+			maxX = tile[0];
+		}		
+		if (tile[0] < minX) {
+			minX = tile[0];
+		}		
+		if (tile[1] > maxY) {
+			maxY = tile[1];
+		}		
+		if (tile[1] < minY) {
+			minY = tile[1];
+		}
+	}
+	
+	//Fill lines in bounds with (?)
+	var lines = []
+	for (y = minY; y < maxY+1; y++) {
+		var line = "";
+		for (x = minX; x < maxX+1; x++) {
+			line += "?";
+		}
+		lines.push(line);
+	}
+	
+	//Fill in all tiles
+	for (tile of terrain) {
+		split = lines[tile[1]-minY].split("");
+		split[tile[0]-minX] = tile[2];
+		lines[tile[1]-minY] = split.join("");
+	}
+	
+	//Mark starting point with a *
+	split = lines[0-minY].split("");
+	split[0-minX] = "*";
+	lines[0-minY] = split.join("");
+	
+	//Mark robot with facing character
+	faces = ['U','R','D','L'];
+	split = lines[robot.y-minY].split("");
+	split[robot.x-minX] = faces[robot.facing];
+	lines[robot.y-minY] = split.join("");
+	
+	//Mark targeted wall with a different class
+	split = lines[robot.lastWallY-minY].split("");
+	split[robot.lastWallX-minX] = "$";
+	lines[robot.lastWallY-minY] = split.join("");
+	
+	//Console output
+	/*console.log("");
+	console.log("");
+	console.log("");
+	for (line of lines) {
+		console.log(line);
+	}*/
+	
+	//Replace single character identifiers with css classes and fullspace chars
+	for (i = 0; i < lines.length; i++) {
+		lines[i] = lines[i].split("?").join('<a class="unknown">\uff1f</a>');
+		lines[i] = lines[i].split("#").join('<a class="wall">\uff03</a>');
+		lines[i] = lines[i].split("$").join('<a class="lastwall">\uff03</a>');
+		lines[i] = lines[i].split(".").join('<a class="empty">\uff0e</a>');
+		lines[i] = lines[i].split("O").join('<a class="oxygen">\uff20</a>');
+		lines[i] = lines[i].split("*").join('<a class="start">\uff0a</a>');
+		
+		
+		lines[i] = lines[i].split("U").join('<a class="robot">\uff35</a>');
+		lines[i] = lines[i].split("R").join('<a class="robot">\uff32</a>');
+		lines[i] = lines[i].split("D").join('<a class="robot">\uff24</a>');
+		lines[i] = lines[i].split("L").join('<a class="robot">\uff2c</a>');
+		
+		lines[i] = lines[i].split("%").join('<a class="path0">\uff10</a>');
+		lines[i] = lines[i].split("^").join('<a class="path1">\uff11</a>');
+		lines[i] = lines[i].split("(").join('<a class="path2">\uff12</a>');
+		lines[i] = lines[i].split(")").join('<a class="path3">\uff13</a>');
+		lines[i] = lines[i].split("[").join('<a class="path4">\uff14</a>');
+		lines[i] = lines[i].split("]").join('<a class="path5">\uff15</a>');
+		lines[i] = lines[i].split("{").join('<a class="path6">\uff16</a>');
+		lines[i] = lines[i].split("}").join('<a class="path7">\uff17</a>');
+		lines[i] = lines[i].split("-").join('<a class="path8">\uff18</a>');
+		lines[i] = lines[i].split("+").join('<a class="path9">\uff19</a>');
+	}
+	
+	//Print lines
+	document.getElementById("map").innerHTML = "";
+	for (line of lines) {
+		document.getElementById("map").innerHTML += line+"<br>";
+	}
+}
+
+document.addEventListener("keydown", function(event) {
+	const key = event.key;
+	switch (key) {
+		case "ArrowLeft":
+			//event.preventDefault();
+			runBot(4);
+			drawMap();
+			break;
+		case "ArrowRight":
+			//event.preventDefault();
+			runBot(3);
+			drawMap();
+			break;
+		case "ArrowUp":
+			//event.preventDefault();
+			runBot(1);
+			drawMap();
+			break;
+		case "ArrowDown":
+			//event.preventDefault();
+			runBot(2);
+			drawMap();
+			break;
+	}
+	
+	switch (event.keyCode) {
+		case 32:
+			move();
+			break;
+	}
+});
+
+//Checkbox handler
+function mappingAICheck() {
+	if (document.getElementById("mappingAI").checked) {
+		if (!mappingAI) {
+			mappingAI = true;
+			mappingAIInterval = setInterval(move,2);
+			screenDrawInterval = setInterval(drawMap,500);
+		}
+	} else {
+		if (mappingAI) {
+			mappingAI = false;
+			clearInterval(mappingAIInterval);
+			clearInterval(screenDrawInterval);
+			drawMap();
+		} 
+	}	
+}
+
+//Button handler
+function pathingAICheck() {
+	document.getElementById("pathingAIEnabled").disabled = true;
+	document.getElementById("pathingAIEnabled").id = "pathingAI";
+	beginPathFind();
+}
+
+//2019/9b intcode
+function compute(program, ip=0, relativeBase=0, input) {
+	var mem = JSON.parse(JSON.stringify(program));
+	var status;
+	
+	prg: while (ip < mem.length) { //ip = instruction pointer
+		var opcode;
+		var paramModes;
+		var output;
+		
+		//Seperating paramModes from opcode
+		if (mem[ip].toString().length < 3) {
+			opcode = mem[ip];
+			paramModes = "";
+		} else {
+			//Parameter/Immediate modes specified
+			opcode = parseInt(mem[ip].toString().slice(-2));
+			paramModes = mem[ip].toString().slice(0, -2); 
+		}
+		
+		var params = []; //Parameters dependent on mode use
+		var paramsIndexes = []; //Indexes for outputting via different modes
+		
+		switch (opcode) {
+			case 1: //Add
+				paramsIn = 3; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				//output
+				mem[paramsIndexes[2]] = params[0] + params[1];
+				ip+=4;
+				break;
+				
+			case 2: //Multiply
+				paramsIn = 3; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				//output
+				mem[paramsIndexes[2]] = params[0] * params[1];
+				ip+=4;
+				break;
+				
+			case 3: //Input
+				paramsIn = 1; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				if (input != undefined) {
+					mem[paramsIndexes[0]] = input;
+					input = undefined;
+				} else {
+					break prg;
+				}
+				//print(">: "+input);
+				ip+=2;
+				break;
+				
+			case 4: //Output
+				paramsIn = 1; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				status = "output";
+				output = params[0];
+				//print(output);
+				ip+=2;
+				break prg;
+				
+			case 5: //Jump if true (non-zero) 
+				paramsIn = 2; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				if (params[0] != 0) {
+					ip = params[1]; //**jump does not increase ip**
+				} else {
+					ip+=3;
+				}
+				break;
+				
+			case 6: //Jump if false (zero)
+				paramsIn = 2; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				if (params[0] == 0) {
+					ip = params[1];
+				} else {
+					ip+=3;
+				}
+				break;
+				
+			case 7: //Less than (1 < 2)
+				paramsIn = 3; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				if (params[0] < params[1]) {
+					mem[paramsIndexes[2]] = 1;
+				} else {
+					mem[paramsIndexes[2]] = 0;
+				}
+				ip+=4;
+				break;
+				
+			case 8: //Equals
+				paramsIn = 3; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				if (params[0] == params[1]) {
+					mem[paramsIndexes[2]] = 1;
+				} else {
+					mem[paramsIndexes[2]] = 0;
+				}
+				ip+=4;
+				break;		
+				
+			case 9: //Adjust Relative Base
+				paramsIn = 1; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				relativeBase+=params[0];
+				ip+=2;
+				break;
+				
+			case 99: //Exit
+				print("Exit");
+				ip+=1;
+				status = "halt";
+				break prg;
+				
+			default: //Other
+				status = "fail";
+				print("Invalid Operation");
+				ip+=1;
+				alert("fail");
+				break prg;
+		}
+	}
+	
+	return {output:output, status:status, mem:mem, ip:ip, relativeBase:relativeBase};
+}
+
+function expandMemory(memory, amount) {
+	for (i = 0; i < amount; i++) {
+		memory.push(0);
+	}
+	return memory;
+}
+
+function print(text="") {
+	document.body.innerHTML += text + "<br>";
+}
+
+</script>
+
+<style>
+	body {
+		background-color: black;
+		color: white;
+		font: 11px Monospace;
+	}
+	
+	.aoc {
+		font: 16px Monospace;
+		color: #00cc00;
+		text-shadow: 0 0 2px #00cc00, 0 0 5px #00cc00;
+		text-decoration: none;
+	}
+	
+
+	.aoc:hover {
+		color: #99ff99;
+		text-shadow: 0 0 2px #99ff99, 0 0 5px #99ff99;
+	}
+	
+	.unknown {
+		color: rgba(0,0,0,0);
+	}
+	
+	#map {
+		padding: 1px;
+		border: 1px solid white;
+		width: fit-content;
+	}
+	
+	.wall {
+		background-color: rgba(100,150,255,0.5);
+	}
+	
+	.lastwall {
+		background-color: rgba(255,100,255,0.5);
+	}
+	
+	.empty {
+		background-color: rgba(255,255,255,0.2);
+	}
+	
+	.oxygen {
+		background-color: rgba(255, 150, 100, 1);
+	}	
+	
+	.start {
+		background-color: rgba(100, 255, 100, 0.75);
+	}
+	
+	.path0 {background-color: rgba(0,255,255,0.2)}
+	.path1 {background-color: rgba(255,0,255,0.2)}
+	.path2 {background-color: rgba(255,255,0,0.2)}
+	.path3 {background-color: rgba(255,0,0,0.2)}
+	.path4 {background-color: rgba(0,255,0,0.2)}
+	.path5 {background-color: rgba(0,0,255,0.2)}
+	.path6 {background-color: rgba(100,100,255,0.2)}
+	.path7 {background-color: rgba(255,100,100,0.2)}
+	.path8 {background-color: rgba(100,255,100,0.2)}
+	.path9 {background-color: rgba(255,255,100,0.2)}
+	
+	#checkText {
+		position: relative;
+		top: -3px;
+	}
+	
+	#menu {
+		position: relative;
+		top: -10px;
+		display: inline-block;
+	}
+	
+	#pathingAI {
+		position: relative;
+		font: 11px Monospace;
+		top: -3px;
+		background-color: rgba(255,255,255,0.5);
+		color: rgba(0,0,0,0.5)
+	}
+	
+	#pathingAIEnabled {
+		position: relative;
+		font: 11px Monospace;
+		top: -3px;
+		background-color: lime;
+		color: rgba(0,0,0,1)
+	}
+</style>
+
+<center>
+	<br>
+	<h4><a class="aoc" target="_blank" href="https://adventofcode.com/2019/day/15">Advent of Code > Day 15 > Part 1</a></h4>
+	<div id="menu">
+		<a style="top: -3px; position: relative; color: rgba(100,150,255,1)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Use arrow keys to move around, run path after full map is completed &nbsp;&nbsp;&nbsp;&nbsp;</a>
+		<input onclick="mappingAICheck()" type="checkbox" id="mappingAI"><a id="checkText">Enable Mapping AI</a></input>&nbsp;&nbsp;
+		<input onclick="pathingAICheck()" type="button" id="pathingAI" value="Run Pathing AI" disabled></input>
+	</div>
+	<div id="map"></div>
+</center>
