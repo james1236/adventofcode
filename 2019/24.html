@@ -1,0 +1,140 @@
+<script>
+
+var input =    ["#####",
+				".....",
+				"....#",
+				"#####",
+				".###."];
+				
+
+var bugs = [];
+var states = [];
+
+decodeInput();
+
+printState();
+while (!checkMatch()) {
+	stepBugs();
+	printState();
+}
+
+print(calculateBiodiversity());
+
+function decodeInput() {
+	for (line of input) {
+		bugs.push([]);
+		for (point of line) {
+			bugs[bugs.length-1].push(point);
+		}
+	}
+	
+	states.push(JSON.stringify(bugs));
+}
+
+function checkMatch() {
+	for (source = 0; source < states.length; source++) {
+		for (target = 0; target < states.length; target++) {
+			if (source != target) {
+				if (states[source] == states[target]) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+function calculateBiodiversity() {
+	var index = 0;
+	var biodiversity = 0;
+	
+	for (y = 0; y < bugs.length; y++) {
+		for (x = 0; x < bugs[y].length; x++) {
+			if (bugs[y][x] == "#") {
+				biodiversity += (Math.pow(2,index));
+			}
+			index++;
+		}
+	}
+	
+	return biodiversity
+}
+
+function stepBugs() {
+	var output = JSON.parse(JSON.stringify(bugs));
+	
+	for (y = 0; y < bugs.length; y++) {
+		for (x = 0; x < bugs[y].length; x++) {
+			var n = getNeighbours(x,y);
+			if (bugs[y][x] == "#") {
+				if (aliveNeighbours(n) != 1) {
+					output[y][x] = ".";
+				}
+			} else {
+				if (aliveNeighbours(n) == 1 || aliveNeighbours(n) == 2) {
+					output[y][x] = "#";
+				}
+			}
+		}
+	}
+	
+	states.push(JSON.stringify(output));
+	bugs = JSON.parse(JSON.stringify(output));
+}
+
+function printState() {
+	(states.length > 1) ? print("") : null;
+	
+	print("-----"+states.length+"-----");
+	for (line of bugs) {
+		print(line);
+	}
+}
+
+function aliveNeighbours(n) {
+	var total = 0;
+	for (bug of n) {
+		if (bug) {
+			total++;
+		}
+	}
+	return total;
+}
+
+function getNeighbours(x,y) {
+	var n = [null,null,null,null];
+	n[0] = isBug(x,y-1); //up
+	n[1] = isBug(x,y+1); //down
+	n[2] = isBug(x-1,y); //left
+	n[3] = isBug(x+1,y); //right
+	
+	return n;
+}
+
+function isBug(x,y) {
+	//Bounds check
+	if (y >= bugs.length) {
+		return false;
+	}
+	if (x >= bugs[0].length) {
+		return false;
+	}
+	if (y < 0) {
+		return false;
+	}
+	if (x < 0) {
+		return false;
+	}
+	
+	//Bug check
+	if (bugs[y][x] == "#") {
+		return true;
+	}
+	return false;
+}
+
+function print(text) {
+	document.write(text + "<br>");
+}
+
+</script>
