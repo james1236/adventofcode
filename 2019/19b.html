@@ -1,0 +1,502 @@
+<head><title>Takes a few mins to load</title></head>
+
+<script>
+
+var input = [109,424,203,1,21101,11,0,0,1106,0,282,21102,1,18,0,1105,1,259,1202,1,1,221,203,1,21101,0,31,0,1105,1,282,21102,38,1,0,1106,0,259,21002,23,1,2,21202,1,1,3,21102,1,1,1,21102,57,1,0,1106,0,303,1202,1,1,222,20102,1,221,3,20102,1,221,2,21102,259,1,1,21102,80,1,0,1105,1,225,21101,0,145,2,21102,91,1,0,1105,1,303,2101,0,1,223,20101,0,222,4,21102,259,1,3,21101,225,0,2,21102,1,225,1,21102,1,118,0,1105,1,225,20101,0,222,3,21101,0,197,2,21101,133,0,0,1106,0,303,21202,1,-1,1,22001,223,1,1,21101,0,148,0,1105,1,259,1202,1,1,223,21001,221,0,4,21001,222,0,3,21102,1,19,2,1001,132,-2,224,1002,224,2,224,1001,224,3,224,1002,132,-1,132,1,224,132,224,21001,224,1,1,21102,195,1,0,105,1,109,20207,1,223,2,21002,23,1,1,21102,-1,1,3,21101,0,214,0,1105,1,303,22101,1,1,1,204,1,99,0,0,0,0,109,5,1201,-4,0,249,22101,0,-3,1,22101,0,-2,2,21202,-1,1,3,21102,250,1,0,1106,0,225,22101,0,1,-4,109,-5,2105,1,0,109,3,22107,0,-2,-1,21202,-1,2,-1,21201,-1,-1,-1,22202,-1,-2,-2,109,-3,2106,0,0,109,3,21207,-2,0,-1,1206,-1,294,104,0,99,22102,1,-2,-2,109,-3,2105,1,0,109,5,22207,-3,-4,-1,1206,-1,346,22201,-4,-3,-4,21202,-3,-1,-1,22201,-4,-1,2,21202,2,-1,-1,22201,-4,-1,1,21201,-2,0,3,21101,343,0,0,1105,1,303,1105,1,415,22207,-2,-3,-1,1206,-1,387,22201,-3,-2,-3,21202,-2,-1,-1,22201,-3,-1,3,21202,3,-1,-1,22201,-3,-1,2,22101,0,-4,1,21102,384,1,0,1106,0,303,1106,0,415,21202,-4,-1,-4,22201,-4,-3,-4,22202,-3,-2,-2,22202,-2,-4,-4,22202,-3,-2,-3,21202,-4,-1,-2,22201,-3,-2,1,22102,1,1,-4,109,-5,2105,1,0];
+
+//Increase memory size to avoid out of bounds errors
+input = expandMemory(input, 0);
+
+var defaultState = {
+	ip: 0,
+	relativeBase : 0,
+	mem: JSON.parse(JSON.stringify(input))
+};
+
+var picture = [];
+//Set min to reduce the processing time
+var min = 1500;
+var max = 2000;
+scanBeam();
+
+var point = getClosestBoxPoint(100);
+if (point) {
+	picture[point[1]-min][point[0]-min+99] = "+"; //top left
+	picture[point[1]-min][point[0]-min] = "O"; //closest
+}
+drawPicture();
+print((point[0]*10000)+point[1]);
+
+function scanBeam() {
+	var programState = JSON.parse(JSON.stringify(defaultState));
+	for (y = min; y < max; y++) {
+		picture.push([]);
+		for (x = min; x < max; x++) {
+			var programState = JSON.parse(JSON.stringify(defaultState));
+			programState = computeState(programState,x);
+			programState = computeState(programState,y);
+			picture[y-min].push((programState.output) ? "#" : "_");
+		}
+	}
+}
+
+//Gives the X position where a beam ends at a given y position
+function getBeamEnd(y) {
+	var beamStart = false;
+	var x;
+	
+	//Find upper edge of beam at given y position
+	for (var x = min; x < max; x++) {
+		if (picture[y-min][x-min] == "#") {
+			beamStart = true;
+		} else {
+			//If beam has started and the current x is not beam
+			if (beamStart) {
+				//Return last x pos
+				return x-1;
+			}
+		}
+	}
+	
+	//Out of bounds
+	return false;
+}
+
+//Gives the diagonal length of a box given the top edge's y position
+function getBoxDiagonal(y) {
+	var length = 0;
+	x = getBeamEnd(y);
+	
+	//Out of bounds
+	if (x === false) {
+		return false;
+	}
+
+	//Go down and to the left diagonally until beam ends to find diagonal length (i.e box dimensions)
+	xx = x;
+	yy = y;
+	while (picture[yy-min][xx-min] == "#") {
+		xx--;
+		yy++;
+		length++;
+		
+		//Out of bounds
+		if (yy >= max) {
+			return false;
+		}
+		if (0 > xx) {
+			return false;
+		}
+	}
+	
+	return length;
+}
+
+function getClosestBoxPoint(dimension) {
+	for (var y = min; y < max; y++) {
+		var length = getBoxDiagonal(y);
+		if (length == dimension) {
+			return [getBeamEnd(y)-dimension+1,y];
+		}
+	}
+	alert("not found");
+	return false;
+}
+
+function drawPicture() {
+	for (line of picture) {
+		print(line.join(""));
+	}
+}
+
+//Intcode
+function intcodeTest() {
+	var state = {
+		ip:0,
+		relativeBase:0,
+		mem: JSON.parse(JSON.stringify(input)),
+	}
+	
+	var intInput;
+	
+	while (true) {
+		state = computeState(state, intInput);
+		intInput = undefined;
+		if (state.status == "input") {
+			intInput = parseInt(prompt("Intcode input: "));
+		}
+		if (state.status == "output") {
+			alert(state.output);
+		}
+		if (state.status == "halt") {
+			alert("halt");
+			return;
+		}
+	}
+}
+
+function computeState(state,input) {
+	return compute(state.mem,state.ip,state.relativeBase,input);
+}
+
+function compute(program, ip=0, relativeBase=0, input) {
+	var mem = JSON.parse(JSON.stringify(program));
+	var status;
+	
+	prg: while (ip < mem.length) { //ip = instruction pointer
+		var opcode;
+		var paramModes;
+		var output;
+		
+		//Seperating paramModes from opcode
+		if (mem[ip].toString().length < 3) {
+			opcode = mem[ip];
+			paramModes = "";
+		} else {
+			//Parameter/Immediate modes specified
+			opcode = parseInt(mem[ip].toString().slice(-2));
+			paramModes = mem[ip].toString().slice(0, -2); 
+		}
+		
+		var params = []; //Parameters dependent on mode use
+		var paramsIndexes = []; //Indexes for outputting via different modes
+		
+		switch (opcode) {
+			case 1: //Add
+				paramsIn = 3; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				//output
+				mem[paramsIndexes[2]] = params[0] + params[1];
+				ip+=4;
+				break;
+				
+			case 2: //Multiply
+				paramsIn = 3; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				//output
+				mem[paramsIndexes[2]] = params[0] * params[1];
+				ip+=4;
+				break;
+				
+			case 3: //Input
+				paramsIn = 1; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				if (input != undefined) {
+					mem[paramsIndexes[0]] = input;
+					input = undefined;
+				} else {
+					status = "input";
+					break prg;
+				}
+				//print(">: "+input);
+				ip+=2;
+				break;
+				
+			case 4: //Output
+				paramsIn = 1; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				status = "output";
+				output = params[0];
+				//print(output);
+				ip+=2;
+				break prg;
+				
+			case 5: //Jump if true (non-zero) 
+				paramsIn = 2; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				if (params[0] != 0) {
+					ip = params[1]; //**jump does not increase ip**
+				} else {
+					ip+=3;
+				}
+				break;
+				
+			case 6: //Jump if false (zero)
+				paramsIn = 2; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				if (params[0] == 0) {
+					ip = params[1];
+				} else {
+					ip+=3;
+				}
+				break;
+				
+			case 7: //Less than (1 < 2)
+				paramsIn = 3; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				if (params[0] < params[1]) {
+					mem[paramsIndexes[2]] = 1;
+				} else {
+					mem[paramsIndexes[2]] = 0;
+				}
+				ip+=4;
+				break;
+				
+			case 8: //Equals
+				paramsIn = 3; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				if (params[0] == params[1]) {
+					mem[paramsIndexes[2]] = 1;
+				} else {
+					mem[paramsIndexes[2]] = 0;
+				}
+				ip+=4;
+				break;		
+				
+			case 9: //Adjust Relative Base
+				paramsIn = 1; //Number of parameters taken
+				for (paramIndex = 0; paramIndex < paramsIn; paramIndex++) { //For each parameter
+					//Select the correct mode
+					if (0 > (paramModes.length-1-paramIndex)) {
+						paramMode = "0";
+					} else {
+						paramMode = paramModes[paramModes.length-1-paramIndex];
+					}
+					
+					//Perform correct action for mode
+					switch (paramMode) {
+						case "0":
+							params.push(mem[mem[ip+paramIndex+1]]); //position mode	
+							paramsIndexes.push(mem[ip+paramIndex+1]);
+							break;
+						case "1":
+							params.push(mem[ip+paramIndex+1]); //immediate mode
+							paramsIndexes.push((ip+paramIndex+1));
+							break;
+						case "2":
+							params.push(mem[relativeBase + mem[ip+paramIndex+1]]); //relative mode
+							paramsIndexes.push((relativeBase + mem[ip+paramIndex+1]));
+							break;
+					}
+				}
+				
+				relativeBase+=params[0];
+				ip+=2;
+				break;
+				
+			case 99: //Exit
+				print("Exit");
+				ip+=1;
+				status = "halt";
+				break prg;
+				
+			default: //Other
+				status = "fail";
+				print("Invalid Operation");
+				ip+=1;
+				alert("fail");
+				break prg;
+		}
+	}
+	
+	return {output:output, status:status, mem:mem, ip:ip, relativeBase:relativeBase};
+}
+
+function expandMemory(memory, amount) {
+	for (i = 0; i < amount; i++) {
+		memory.push(0);
+	}
+	return memory;
+}
+
+function print(text) {
+	document.write(text + "<br>");
+}
+
+function userInput(msg="Intcode input: ") {
+	return parseInt(prompt(msg));
+}
+
+</script>
