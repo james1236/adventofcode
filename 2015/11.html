@@ -1,0 +1,75 @@
+<script>
+
+var input = "hepxcrrq";
+
+while (true) {
+	increment();
+	
+	fail = false;
+	straight = false;
+	straightLength = 0;
+	pair = false;
+	pairIndex = -1;
+	pairType = "";
+	
+	for (i = 0; i < input.length; i++) {
+		//Straight
+		if (i == 0) {
+			straightVal = input.charCodeAt(0);
+		} else {
+			if (!straight) {
+				if (input.charCodeAt(i) == input.charCodeAt(i-1)+1) {
+					straightLength++;
+					if (straightLength == 2) {
+						straight = true;
+					}
+				} else {
+					straightLength = 0;
+				}
+			}
+		}
+		
+		//Exclude
+		if (input[i] == "i" || input[i] == "o" || input[i] == "l") {
+			fail = true;
+			break;
+		}
+		
+		//Pair
+		if (!pair && i > 0 && input[i] == input[i-1]) {
+			if (pairIndex == -1) {
+				pairType = input[i];
+				pairIndex = i;
+			} else {
+				if (input[i] != pairType && Math.abs(pairIndex-i) > 1) {
+					pair = true;
+				}
+			}
+		}
+	}
+	if (!fail && pair && straight) {
+		document.write(input);
+		break;
+	}
+}
+
+function increment(pos) {
+	if (pos == undefined) {
+		pos = input.length-1;
+	}
+	
+	//Overflow
+	if (pos == 0 && input[pos] == "z") {
+		input = "a"+input.substr(1);
+		return;
+	}
+	
+	if (input[pos] == "z") { //Carry
+		input = input.slice(0, pos) + "a" + input.slice(pos+1);
+		increment(pos-1);
+	} else { //Increment character
+		input = input.slice(0, pos) + String.fromCharCode(input.charCodeAt(pos)+1) + input.slice(pos+1);
+	}
+}
+
+</script>

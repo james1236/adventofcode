@@ -1,0 +1,78 @@
+<script>
+
+var input = ["Tristram to AlphaCentauri = 34","Tristram to Snowdin = 100","Tristram to Tambi = 63","Tristram to Faerun = 108","Tristram to Norrath = 111","Tristram to Straylight = 89","Tristram to Arbre = 132","AlphaCentauri to Snowdin = 4","AlphaCentauri to Tambi = 79","AlphaCentauri to Faerun = 44","AlphaCentauri to Norrath = 147","AlphaCentauri to Straylight = 133","AlphaCentauri to Arbre = 74","Snowdin to Tambi = 105","Snowdin to Faerun = 95","Snowdin to Norrath = 48","Snowdin to Straylight = 88","Snowdin to Arbre = 7","Tambi to Faerun = 68","Tambi to Norrath = 134","Tambi to Straylight = 107","Tambi to Arbre = 40","Faerun to Norrath = 11","Faerun to Straylight = 66","Faerun to Arbre = 144","Norrath to Straylight = 115","Norrath to Arbre = 135","Straylight to Arbre = 127"];
+
+sequence = [];
+locations = [];
+distances = [];
+
+for (route of input) {
+	locs = route.split(" = ")[0].split(" to ");
+	locations.push(locs);
+	distances.push(parseInt(route.split(" = ")[1]));
+	for (let i = 0; i < 2; i++) {
+		if (!isMember(locs[i], sequence)) {
+			sequence.push(locs[i]);
+		}
+	}
+}
+
+permTable = generatePermutations(sequence);
+mostDistance = -1;
+mostIndex = -1;
+
+for (i = 0; i < permTable.length; i++) {
+	total = 0;
+	for (j = 0; j < permTable[i].length; j++) {
+		if (j > 0) {
+			total+= findDistance(permTable[i][j], permTable[i][j-1]);
+		}
+	}
+	if (total > mostDistance) {
+		mostDistance = total;
+		mostIndex = i;
+	}
+}
+
+document.write(mostDistance);
+
+function findDistance(placeA, placeB) {
+	for (z = 0; z < locations.length; z++) {
+		if ((locations[z][0] == placeA || locations[z][0] == placeB) && (locations[z][1] == placeA || locations[z][1] == placeB) && placeA != placeB) {
+			return distances[z];
+		}
+	}
+}
+
+function isMember(item,arr) {
+	for (it of arr) {
+		if (it == item) {
+			return true;
+		}
+	}
+	return false;
+}
+
+//Taken from my solution to advent of code 2019/7.html
+function generatePermutations(remainingDigits) { //Deterministically & recursively generates all possible permutations of an input sequence
+	if (remainingDigits.length == 1) {
+		return [[remainingDigits[0]]];
+	} else {
+		var permutations = [];
+		for (var digitIndex = 0; digitIndex < remainingDigits.length; digitIndex++) {
+			var digit = remainingDigits[digitIndex];
+			
+			var tempRemainingDigits = JSON.parse(JSON.stringify(remainingDigits));
+			tempRemainingDigits.splice(digitIndex, 1);
+			
+			var subPermutations = generatePermutations(tempRemainingDigits);
+			for (var permutation of subPermutations) {
+				permutation.unshift(digit);
+				permutations.push(permutation);
+			}
+		}
+		return permutations;
+	}
+}
+
+</script>

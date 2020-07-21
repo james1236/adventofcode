@@ -1,0 +1,29 @@
+<script src="md5.js"></script>
+<script>
+
+var input = "iwrupvqb";
+
+var i = 0;
+brute:
+	while (true) {
+		hash = md5(input+i);
+		
+		flag = false;
+		for (j = 0; j < 5; j++) {
+			if (hash[j] != 0) {
+				flag = true;
+				break;
+			}
+		}
+		
+		if (!flag) {
+			break brute;
+		}
+		
+		i++;
+	}
+
+
+document.write(i);
+
+</script>

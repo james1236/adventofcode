@@ -1,0 +1,99 @@
+<script>
+
+var input = ["Alice would gain 54 happiness units by sitting next to Bob.","Alice would lose 81 happiness units by sitting next to Carol.","Alice would lose 42 happiness units by sitting next to David.","Alice would gain 89 happiness units by sitting next to Eric.","Alice would lose 89 happiness units by sitting next to Frank.","Alice would gain 97 happiness units by sitting next to George.","Alice would lose 94 happiness units by sitting next to Mallory.","Bob would gain 3 happiness units by sitting next to Alice.","Bob would lose 70 happiness units by sitting next to Carol.","Bob would lose 31 happiness units by sitting next to David.","Bob would gain 72 happiness units by sitting next to Eric.","Bob would lose 25 happiness units by sitting next to Frank.","Bob would lose 95 happiness units by sitting next to George.","Bob would gain 11 happiness units by sitting next to Mallory.","Carol would lose 83 happiness units by sitting next to Alice.","Carol would gain 8 happiness units by sitting next to Bob.","Carol would gain 35 happiness units by sitting next to David.","Carol would gain 10 happiness units by sitting next to Eric.","Carol would gain 61 happiness units by sitting next to Frank.","Carol would gain 10 happiness units by sitting next to George.","Carol would gain 29 happiness units by sitting next to Mallory.","David would gain 67 happiness units by sitting next to Alice.","David would gain 25 happiness units by sitting next to Bob.","David would gain 48 happiness units by sitting next to Carol.","David would lose 65 happiness units by sitting next to Eric.","David would gain 8 happiness units by sitting next to Frank.","David would gain 84 happiness units by sitting next to George.","David would gain 9 happiness units by sitting next to Mallory.","Eric would lose 51 happiness units by sitting next to Alice.","Eric would lose 39 happiness units by sitting next to Bob.","Eric would gain 84 happiness units by sitting next to Carol.","Eric would lose 98 happiness units by sitting next to David.","Eric would lose 20 happiness units by sitting next to Frank.","Eric would lose 6 happiness units by sitting next to George.","Eric would gain 60 happiness units by sitting next to Mallory.","Frank would gain 51 happiness units by sitting next to Alice.","Frank would gain 79 happiness units by sitting next to Bob.","Frank would gain 88 happiness units by sitting next to Carol.","Frank would gain 33 happiness units by sitting next to David.","Frank would gain 43 happiness units by sitting next to Eric.","Frank would gain 77 happiness units by sitting next to George.","Frank would lose 3 happiness units by sitting next to Mallory.","George would lose 14 happiness units by sitting next to Alice.","George would lose 12 happiness units by sitting next to Bob.","George would lose 52 happiness units by sitting next to Carol.","George would gain 14 happiness units by sitting next to David.","George would lose 62 happiness units by sitting next to Eric.","George would lose 18 happiness units by sitting next to Frank.","George would lose 17 happiness units by sitting next to Mallory.","Mallory would lose 36 happiness units by sitting next to Alice.","Mallory would gain 76 happiness units by sitting next to Bob.","Mallory would lose 34 happiness units by sitting next to Carol.","Mallory would gain 37 happiness units by sitting next to David.","Mallory would gain 40 happiness units by sitting next to Eric.","Mallory would gain 18 happiness units by sitting next to Frank.","Mallory would gain 7 happiness units by sitting next to George."];
+
+people = [];
+happy = [];
+pairs = [];
+
+for (i = 0; i < input.length; i++) {
+	//[[Mallory,7],George];
+	decode = input[i].substr(0,input[i].length-1).split(" happiness units by sitting next to ");
+	if (input[i].includes("gain")) {
+		decode[0] = decode[0].split(" would gain ");
+		decode[0][1] = parseInt(decode[0][1]);
+	} else {
+		decode[0] = decode[0].split(" would lose ");
+		decode[0][1] = -parseInt(decode[0][1]);
+	}
+	happy.push(decode[0][1]);
+	pairs.push([decode[0][0],decode[1]]);
+	
+	if (!isMember(decode[0][0],people)) {
+		people.push(decode[0][0]);
+	}	
+	if (!isMember(decode[1],people)) {
+		people.push(decode[1]);
+	}
+}
+
+permTable = generatePermutations(people);
+happiest = Number.MIN_SAFE_INTEGER;
+
+for (i = 0; i < permTable.length; i++) {
+	total = 0;
+	for (p = 0; p < permTable[i].length; p++) {
+		if (p == 0 || (p == permTable[i].length-1)) {
+			if (p == 0) {
+				total+= findHappy(permTable[i][p],permTable[i][permTable[i].length-1]);
+				total+= findHappy(permTable[i][p],permTable[i][p+1]);
+			} else {
+				total+= findHappy(permTable[i][p],permTable[i][p-1]);
+				total+= findHappy(permTable[i][p],permTable[i][0]);
+			}
+		} else {
+			total+= findHappy(permTable[i][p],permTable[i][p-1]);
+			total+= findHappy(permTable[i][p],permTable[i][p+1]);
+		}
+	}
+
+	if (total > happiest) {
+		happiest = total;
+	}
+}
+
+document.write(happiest);
+
+function findHappy(personA, personB) {
+	for (z = 0; z < happy.length; z++) {
+		if ((pairs[z][0] == personA) && (pairs[z][1] == personB) ) {
+			return happy[z];
+		}
+	}
+}
+
+function isMember(item,arr) {
+	for (it of arr) {
+		if (it == item) {
+			return true;
+		}
+	}
+	return false;
+}
+
+//Taken from my solution to advent of code 2019/7.html
+function generatePermutations(remainingDigits) { //Deterministically & recursively generates all possible permutations of an input sequence
+	if (remainingDigits.length == 1) {
+		return [[remainingDigits[0]]];
+	} else {
+		var permutations = [];
+		for (var digitIndex = 0; digitIndex < remainingDigits.length; digitIndex++) {
+			var digit = remainingDigits[digitIndex];
+			
+			var tempRemainingDigits = JSON.parse(JSON.stringify(remainingDigits));
+			tempRemainingDigits.splice(digitIndex, 1);
+			
+			var subPermutations = generatePermutations(tempRemainingDigits);
+			for (var permutation of subPermutations) {
+				permutation.unshift(digit);
+				permutations.push(permutation);
+			}
+		}
+		return permutations;
+	}
+}
+
+
+
+
+</script>

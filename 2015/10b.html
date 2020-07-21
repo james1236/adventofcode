@@ -1,0 +1,28 @@
+<script>
+
+var input = "3113322113";
+
+for (rep = 0; rep < 50; rep++) {
+	current = "";
+	currentTotal = 0;
+	output = "";
+	for (i = 0; i < input.length+1; i++) {
+		if (i == 0) {
+			current = input[0];
+		}
+		if (input[i] == current) {
+			currentTotal++;
+		}
+		if (input[i] != current) {
+			output+=currentTotal+current;
+			
+			current = input[i];
+			currentTotal = 1;
+		}
+	}
+	input = output;
+}
+
+document.write(input.length);
+
+</script>
